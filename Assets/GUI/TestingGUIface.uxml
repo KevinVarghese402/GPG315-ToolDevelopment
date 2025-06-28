@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/GUI/GUI_Testing.uss?fileID=7433441132597879392&amp;guid=6c243bdf8a3ff6f489acee62fc772bca&amp;type=3#GUI_Testing" />
+    <ui:Label text="Just Testing Things&#10;" style="color: rgb(90, 255, 69);" />
+</ui:UXML>
