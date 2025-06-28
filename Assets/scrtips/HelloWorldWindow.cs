@@ -1,12 +1,19 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 
 public class HelloWorldWindow : EditorWindow
 {
+    public string Name = "Kevin";
     [MenuItem("Window/Hello World")]
     public static void ShowWindow()
     {
         GetWindow<HelloWorldWindow>("Hello World");
+    }
+
+    private void Update()
+    {
+        Debug.Log(Name);
     }
 
     void OnGUI()
