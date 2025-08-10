@@ -17,7 +17,6 @@ public class ScriptReferenceFinder : EditorWindow
     
     //results with gameobject
     
-
     // Add menu option under Tools > Script Reference Finder
     [MenuItem("Tools/Script Reference Finder")]
     public static void ShowWindow()

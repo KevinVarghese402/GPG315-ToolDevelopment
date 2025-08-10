@@ -1,15 +1,12 @@
 using UnityEngine;
 using UnityEditor;
-
-[CustomEditor(typeof(CameraManager))]
 public class CameraManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        // Draw the normal inspector first
+        // normal inspector first
         DrawDefaultInspector();
-
-        // Reference to the script
+        
         CameraManager manager = (CameraManager)target;
 
         GUILayout.Space(10);
@@ -34,5 +31,14 @@ public class CameraManagerEditor : Editor
         {
             manager.SetCameraMode(3);
         }
+      
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField("Camera Effects Button", EditorStyles.boldLabel);
+        
+        if (GUILayout.Button("Camera Shake Effect"))
+        {
+            manager.SetCameraMode(4);
+        }
     }
+    
 }

@@ -1,7 +1,5 @@
 using UnityEngine;
-
-
-[RequireComponent(typeof(Camera))]
+using System.Collections;
 public class CustomCameraController : MonoBehaviour
 {
     [Header("Camera Target Settings")]
@@ -56,4 +54,7 @@ public class CustomCameraController : MonoBehaviour
     {
         lockToTarget = shouldLock;
     }
+ 
+
+
 }
