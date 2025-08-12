@@ -1,44 +1,54 @@
 using UnityEngine;
 using UnityEditor;
+
+[CustomEditor(typeof(CameraManager))]
 public class CameraManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        // normal inspector first
         DrawDefaultInspector();
-        
+
         CameraManager manager = (CameraManager)target;
+
+        // Get current dimension suffix
+        string dimSuffix = manager.gameDimension == CameraManager.GameDimension.TwoD ? "(2D)" : "(3D)";
 
         GUILayout.Space(10);
         EditorGUILayout.LabelField("Camera Mode Buttons", EditorStyles.boldLabel);
 
-        if (GUILayout.Button("Follow Mode"))
+        if (GUILayout.Button("Follow Mode " + dimSuffix))
         {
-            manager.SetCameraMode(0);
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.Follow);
         }
 
-        if (GUILayout.Button("Top-Down Mode"))
+        if (GUILayout.Button("Top-Down Mode " + dimSuffix))
         {
-            manager.SetCameraMode(1);
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.TopDown);
         }
 
-        if (GUILayout.Button("Side-Scroller Mode"))
+        if (GUILayout.Button("Side-Scroller Mode " + dimSuffix))
         {
-            manager.SetCameraMode(2);
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.SideScoller);
         }
 
-        if (GUILayout.Button("First Person View"))
+        if (GUILayout.Button("First Person View " + dimSuffix))
         {
-            manager.SetCameraMode(3);
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.FirstPersonView);
         }
-      
+
         GUILayout.Space(10);
-        EditorGUILayout.LabelField("Camera Effects Button", EditorStyles.boldLabel);
-        
+        EditorGUILayout.LabelField("Camera Effects Buttons", EditorStyles.boldLabel);
+
         if (GUILayout.Button("Camera Shake Effect"))
         {
-            manager.SetCameraMode(4);
+            Debug.Log("Camera shaking");
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.CameraShake);
+        }
+
+        if (GUILayout.Button("Camera Dolly Effect"))
+        {
+            Debug.Log("Camera dolly started");
+            manager.SetCameraMode((int)CameraManager.CustomCameraMode.CameraDolly);
         }
     }
-    
 }

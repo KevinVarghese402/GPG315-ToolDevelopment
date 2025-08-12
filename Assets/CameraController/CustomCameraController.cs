@@ -8,7 +8,11 @@ public class CustomCameraController : MonoBehaviour
     [Header("Camera Follow Settings")]
     public Vector3 offset = new Vector3(); 
     public float followSpeed = 5f; // How smooth the follow is
-
+    
+    [Header("Camera Orthographic Settings")]
+    public Camera mainCamera;
+    public bool startAsOrthographic = false;
+    
     [Header("Camera Boundaries Settings")] 
     public bool useBoundaries = false;
     public Vector2 minimalBound;
@@ -20,8 +24,20 @@ public class CustomCameraController : MonoBehaviour
     
     void Start()
     {
-     cam = GetComponent<Camera>();   
+        cam = GetComponent<Camera>();
+        
+        if (mainCamera == null)
+        {
+         mainCamera = cam;
+        }
+
+        if (mainCamera != null)
+        {
+         mainCamera.orthographic = startAsOrthographic;
+        }
+
     }
+    
 
     // Update is called once per frame
     void LateUpdate()
@@ -53,6 +69,13 @@ public class CustomCameraController : MonoBehaviour
     public void SetLockToTarget(bool shouldLock)
     {
         lockToTarget = shouldLock;
+    }
+    
+    public void SetOrthographic(bool isOrtho) 
+    {
+        if (mainCamera != null)
+            mainCamera.orthographic = isOrtho;
+        
     }
  
 

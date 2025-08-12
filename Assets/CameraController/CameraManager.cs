@@ -4,20 +4,31 @@ using System.Collections;
 public class CameraManager : MonoBehaviour
 {
     public CustomCameraController camController;
-    
     [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Camera mainCamera;
     
-    [Header("Offsets of Each Camera")]
+    public enum GameDimension { TwoD, ThreeD }
+    public GameDimension gameDimension = GameDimension.ThreeD;
+    
+    [Header("Offsets of Each Camera 3D")]
     public Vector3 followCameraOffset = new Vector3(0, 5, -10);
     public Vector3 TopDownCameraOffset = new Vector3(10, 5, -10);
     public Vector3 SideScollerCameraOffset = new Vector3(25, 5, -10);
     public Vector3 firstPersonViewOffset = new Vector3(0, 15 -10);
+    
+    [Header("Offsets 2D")]
+    public Vector3 followCameraOffset2D = new Vector3(-10, 0, 0);
+    public Vector3 topDownCameraOffset2D = new Vector3(0, 10, 0);  
+    public Vector3 sideScrollerCameraOffset2D = new Vector3(-10, 0, 0); 
+    public Vector3 firstPersonViewOffset2D = new Vector3(0, 0, -10); 
   
     [Header("Rotations for Each Camera Mode")]
     public Vector3 followRotation = new Vector3(10, 0, 0);
     public Vector3 topDownRotation = new Vector3(90, 0, 0);
     public Vector3 sideScrollerRotation = new Vector3(15, 90, 0);
     public Vector3 firstPersonViewRotation = new Vector3(10, 0, 0);
+    
+    [Header("Rotations 2D")]
     
     [Header("Camera Effects Values")] 
     public float mangitudeValue;
@@ -39,6 +50,23 @@ public class CameraManager : MonoBehaviour
     public void SetCameraMode(int modeIndex)
     {
         CustomCameraMode mode = (CustomCameraMode)modeIndex;
+        
+        //switches when dev goes to gameDim 2D
+        if (camController  != null)
+        {
+            Debug.Log("Testing orthographic toggle at start");
+            bool isOrtho = (gameDimension == GameDimension.TwoD);
+            camController.SetOrthographic(isOrtho);
+        }
+        //debugging issues
+        if (camController == null)
+        {
+            Debug.LogError("camController is NULL in CameraManager!");
+        }
+        else
+        {
+            camController.SetOrthographic(gameDimension == GameDimension.TwoD);
+        }
 
         switch (mode)
         {
@@ -74,8 +102,6 @@ public class CameraManager : MonoBehaviour
                 StartCoroutine(CameraDollyEffect(dollyTarget, dollySpeed));
                 break;
             
-        
-                
         }
     }
     
@@ -104,21 +130,31 @@ public class CameraManager : MonoBehaviour
         cameraTransform.localPosition = originalPos;
     }
     
-    private IEnumerator CameraDollyEffect(Transform target, float speed)
+    private IEnumerator CameraDollyEffect(Transform dollyTarget, float speed)
     {
-        Vector3 startPos = transform.position;
-        Quaternion startRot = transform.rotation;
 
-        Vector3 endPos = target.position;
-        Quaternion endRot = target.rotation;
-
+        Vector3 startOffset = camController.offset;
+        
+        Vector3 targetOffset = dollyTarget.position - camController.target.position; 
+        
         float time = 0f;
 
         while (time < 1f)
         {
             time += Time.deltaTime * speed;
-            transform.position = Vector3.Lerp(startPos, endPos, time);
-            transform.rotation = Quaternion.Lerp(startRot, endRot, time);
+            camController.offset = Vector3.Lerp(startOffset, targetOffset, time);
+            yield return null;
+        }
+
+        // hold dolly for a bit
+        yield return new WaitForSeconds(1f);
+
+        // Return offset to original
+        time = 0f;
+        while (time < 1f)
+        {
+            time += Time.deltaTime * speed;
+            camController.offset = Vector3.Lerp(targetOffset, startOffset, time);
             yield return null;
         }
     }
