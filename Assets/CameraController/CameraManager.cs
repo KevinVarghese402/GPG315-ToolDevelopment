@@ -14,21 +14,25 @@ public class CameraManager : MonoBehaviour
     public Vector3 followCameraOffset = new Vector3(0, 5, -10);
     public Vector3 TopDownCameraOffset = new Vector3(10, 5, -10);
     public Vector3 SideScollerCameraOffset = new Vector3(25, 5, -10);
-    public Vector3 firstPersonViewOffset = new Vector3(0, 15 -10);
+    public Vector3 firstPersonViewOffset = new Vector3(0, 15, -10);
     
-    [Header("Offsets 2D")]
+    [Header("Offsets of Each Camera 2D")]
     public Vector3 followCameraOffset2D = new Vector3(-10, 0, 0);
     public Vector3 topDownCameraOffset2D = new Vector3(0, 10, 0);  
     public Vector3 sideScrollerCameraOffset2D = new Vector3(-10, 0, 0); 
     public Vector3 firstPersonViewOffset2D = new Vector3(0, 0, -10); 
   
-    [Header("Rotations for Each Camera Mode")]
+    [Header("Rotations for Each Camera Mode 3D")]
     public Vector3 followRotation = new Vector3(10, 0, 0);
     public Vector3 topDownRotation = new Vector3(90, 0, 0);
     public Vector3 sideScrollerRotation = new Vector3(15, 90, 0);
     public Vector3 firstPersonViewRotation = new Vector3(10, 0, 0);
     
-    [Header("Rotations 2D")]
+    [Header("2D Rotations for Each Camera Mode")]
+    public Vector3 followRotation2D = new Vector3(10, 0, 0);
+    public Vector3 topDownRotation2D = new Vector3(90, 0, 0);
+    public Vector3 sideScrollerRotation2D = new Vector3(15, 90, 0);
+    public Vector3 firstPersonViewRotation2D = new Vector3(10, 0, 0);
     
     [Header("Camera Effects Values")] 
     public float mangitudeValue;
@@ -36,75 +40,68 @@ public class CameraManager : MonoBehaviour
     
     public Transform dollyTarget; 
     public float dollySpeed = 2f;
+    
     public enum CustomCameraMode
     {
         Follow,
         TopDown,
         SideScoller,
         FirstPersonView,
-        //effects
         CameraShake,
         CameraDolly
     }
 
     public void SetCameraMode(int modeIndex)
     {
-        CustomCameraMode mode = (CustomCameraMode)modeIndex;
-        
-        //switches when dev goes to gameDim 2D
-        if (camController  != null)
-        {
-            Debug.Log("Testing orthographic toggle at start");
-            bool isOrtho = (gameDimension == GameDimension.TwoD);
-            camController.SetOrthographic(isOrtho);
-        }
-        //debugging issues
         if (camController == null)
         {
-            Debug.LogError("camController is NULL in CameraManager!");
-        }
-        else
-        {
-            camController.SetOrthographic(gameDimension == GameDimension.TwoD);
+            Debug.LogError("CameraController is not assigned!");
+            return;
         }
 
-        switch (mode)
+        camController.SetOrthographic(gameDimension == GameDimension.TwoD);
+
+        Vector3 offset = Vector3.zero;
+        Vector3 rotation = Vector3.zero;
+
+        switch ((CustomCameraMode)modeIndex)
         {
             case CustomCameraMode.Follow:
-                camController.offset = followCameraOffset;
-                camController.SetRotation(followRotation);
+                offset = (gameDimension == GameDimension.TwoD) ? followCameraOffset2D : followCameraOffset;
+                rotation = (gameDimension == GameDimension.TwoD) ? followRotation2D : followRotation;
                 camController.SetLockToTarget(false);
-                break;;
-            
+                break;
+
             case CustomCameraMode.TopDown:
-                camController.offset = TopDownCameraOffset;
-                camController.SetRotation(topDownRotation);
+                offset = (gameDimension == GameDimension.TwoD) ? topDownCameraOffset2D : TopDownCameraOffset;
+                rotation = (gameDimension == GameDimension.TwoD) ? topDownRotation2D : topDownRotation;
                 camController.SetLockToTarget(false);
                 break;
-            
+
             case CustomCameraMode.SideScoller:
-                camController.offset = SideScollerCameraOffset;
-                camController.SetRotation(sideScrollerRotation);
+                offset = (gameDimension == GameDimension.TwoD) ? sideScrollerCameraOffset2D : SideScollerCameraOffset;
+                rotation = (gameDimension == GameDimension.TwoD) ? sideScrollerRotation2D : sideScrollerRotation;
                 camController.SetLockToTarget(false);
                 break;
-            
+
             case CustomCameraMode.FirstPersonView:
-                camController.offset = firstPersonViewOffset;
-                camController.SetRotation(firstPersonViewRotation);
+                offset = (gameDimension == GameDimension.TwoD) ? firstPersonViewOffset2D : firstPersonViewOffset;
+                rotation = (gameDimension == GameDimension.TwoD) ? firstPersonViewRotation2D : firstPersonViewRotation;
                 camController.SetLockToTarget(true);
                 break;
-            
-            case CustomCameraMode.CameraShake: 
+
+            case CustomCameraMode.CameraShake:
                 CameraShakeEffect(durationValue, mangitudeValue);
-                break;
-            
+                return;
+
             case CustomCameraMode.CameraDolly:
                 StartCoroutine(CameraDollyEffect(dollyTarget, dollySpeed));
-                break;
-            
+                return;
         }
+
+        camController.offset = offset;
+        camController.SetRotation(rotation);
     }
-    
     
     public void CameraShakeEffect(float duration, float magnitude)
     {
@@ -120,9 +117,7 @@ public class CameraManager : MonoBehaviour
         {
             float x = Random.Range(-1f, 1f) * magnitude;
             float y = Random.Range(-1f, 1f) * magnitude;
-
             cameraTransform.localPosition = originalPos + new Vector3(x, y, 0);
-
             elapsed += Time.deltaTime;
             yield return null;
         }
@@ -132,11 +127,8 @@ public class CameraManager : MonoBehaviour
     
     private IEnumerator CameraDollyEffect(Transform dollyTarget, float speed)
     {
-
         Vector3 startOffset = camController.offset;
-        
         Vector3 targetOffset = dollyTarget.position - camController.target.position; 
-        
         float time = 0f;
 
         while (time < 1f)
@@ -146,10 +138,8 @@ public class CameraManager : MonoBehaviour
             yield return null;
         }
 
-        // hold dolly for a bit
         yield return new WaitForSeconds(1f);
 
-        // Return offset to original
         time = 0f;
         while (time < 1f)
         {
@@ -158,6 +148,4 @@ public class CameraManager : MonoBehaviour
             yield return null;
         }
     }
-    
-    
 }
