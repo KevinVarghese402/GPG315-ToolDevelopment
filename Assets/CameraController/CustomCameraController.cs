@@ -21,6 +21,8 @@ public class CustomCameraController : MonoBehaviour
     
     [Header("Camera Locked Positions")]
     private bool lockToTarget = false;
+    private float halfHeight;
+    private float halfWidth;
     
     void Start()
     {
@@ -44,18 +46,19 @@ public class CustomCameraController : MonoBehaviour
     {
         if (target == null) return;
         
-        if (lockToTarget == true)
+        if (mainCamera != null && mainCamera.orthographic)
         {
-            transform.position = target.position + offset;
+            halfHeight = mainCamera.orthographicSize;
+            halfWidth = halfHeight * mainCamera.aspect;
         }
         else
         {
             Vector3 desiredPosition = target.position + offset;
 
-            if (useBoundaries)
+            if (useBoundaries && mainCamera.orthographic)
             {
-                desiredPosition.x = Mathf.Clamp(desiredPosition.x, minimalBound.x, maxiBound.x);
-                desiredPosition.y = Mathf.Clamp(desiredPosition.y, minimalBound.y, maxiBound.y);
+                float clampedX = Mathf.Clamp(desiredPosition.x, minimalBound.x + halfWidth, maxiBound.x - halfWidth);
+                float clampedY = Mathf.Clamp(desiredPosition.y, minimalBound.y + halfHeight, maxiBound.y - halfHeight);
             }
             transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
         }
